@@ -13,3 +13,5 @@ Prometheus + Grafana stack built with data from micro:bit with attached envirobi
 # OBS
 - Remember it only runs on python3 
 - How does the docker container access the PIs usb port?
+- Altitude is very dependent on the correct sea level pressure (qnh). We should find a way to get that right
+https://openweathermap.org/price
