@@ -1,8 +1,8 @@
 """BME280 Driver."""
-from i2cdevice import Device, Register, BitField, _int_to_bytes, LookupAdapter, Adapter
+from src.i2cdevice import Device, Register, BitField, _int_to_bytes, LookupAdapter, Adapter
 import struct
 import time
-import microbit
+from src import microbit
 import re
 
 __version__ = '0.0.2'
@@ -265,12 +265,12 @@ class BME280:
         self.update_sensor()
         return self.humidity
 
-    def get_altitude(self, qnh=1017):
+    def get_altitude(self, qnh=1000):
         self.update_sensor()
         self.altitude = 44330.0 * (1.0 - pow(self.pressure / qnh, (1.0 / 5.255)))
         return self.altitude
 
-    def all(self, qnh=1017):
+    def all(self, qnh=1000):
         self.update_sensor()
         self.altitude = 44330.0 * (1.0 - pow(self.pressure / qnh, (1.0 / 5.255)))
         return self.temperature, self.pressure, self.humidity, self.altitude

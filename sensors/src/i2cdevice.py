@@ -1,5 +1,5 @@
 from collections import namedtuple
-import microbit
+from src import microbit
 import re
 from codecs import encode
 

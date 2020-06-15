@@ -1,7 +1,7 @@
 """Library for the TCS3472 colour light to digital converter with IR filter."""
 import time
 from collections import namedtuple
-from i2cdevice import Device, Register, BitField, Adapter, LookupAdapter, U16ByteSwapAdapter
+from src.i2cdevice import Device, Register, BitField, Adapter, LookupAdapter, U16ByteSwapAdapter
 
 __version__ = '0.0.1'
 

@@ -1,0 +1,18 @@
+version: '3'
+services:
+  sensors:
+    container_name: sensors
+    build:
+      context: .
+    restart: unless-stopped
+    ports:
+      - 6080:6080
+    devices:
+      - /dev/ttyACM0:/dev/ttyACM0
+    networks:
+      - default
+
+networks:
+  default:
+    external:
+      name: prom_monitor-net

@@ -1,22 +1,34 @@
-version: '3.1'
+version: '3.5'
 
 volumes:
-    prometheus_data: {}
-    grafana_data: {}
+    prometheus_data: 
+        driver: local
+        driver_opts:
+          type: none
+          device: /mnt/storage/prom_data
+          o: bind
+    grafana_data: 
+        driver: local
+        driver_opts:
+          type: none
+          device: /mnt/storage/grafana_data
+          o: bind
 
 networks:
   monitor-net:
+      attachable: true
 
 services:
 
   prometheus:
-    image: prom/prometheus:v2.15.2
+    image: prom/prometheus:latest
     volumes:
       - ./prometheus/:/etc/prometheus/
       - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
     ports:
@@ -25,8 +37,11 @@ services:
       - cadvisor
     networks:
       - monitor-net
-    restart: always
     deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
       placement:
         constraints:
           - node.role==manager
@@ -48,8 +63,11 @@ services:
       - 9100:9100
     networks:
       - monitor-net
-    restart: always
     deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
       mode: global
 
   alertmanager:
@@ -60,30 +78,34 @@ services:
       - "./alertmanager/:/etc/alertmanager/"
     networks:
       - monitor-net
-    restart: always
     command:
       - '--config.file=/etc/alertmanager/config.yml'
       - '--storage.path=/alertmanager'
     deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
       placement:
         constraints:
            - node.role==manager
 
-  sensors:
-    image: Hojland/micro_sensors:latest
-    build: # build is ignored by docker stack.
-      context: ./sensors/
-      dockerfile: Dockerfile
-    ports:
-      - 6080:6080
-      - 5666:5666
-    volumes:
-      - "./data:/sensors/data" #Think this volume should be on harddisk instead
-    networks:
-      - monitor-net
-    deploy:
-      restart_policy:
-        condition: none
+#  sensors:
+#    image: hojland/micro_sensors:latest
+#    volumes:
+#      - /dev/ttyACM0:/dev/ttyACM0
+#    build: # build is ignored by docker stack.
+#      context: ./sensors/
+#      dockerfile: Dockerfile
+#    ports:
+#      - 6080:6080
+##    devices:
+##      - /dev/ttyACM0:/dev/ttyACM0
+#    networks:
+#      - monitor-net
+#    deploy:
+#      restart_policy:
+#        condition: none
 
   cadvisor:
     image: budry/cadvisor-arm:0.30.2
@@ -97,8 +119,11 @@ services:
       - 8080:8080
     networks:
       - monitor-net
-    restart: always
     deploy:
+      restart_policy:        
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
       mode: global
 
   grafana:
@@ -114,8 +139,17 @@ services:
       - ./grafana/config.monitoring
     networks:
       - monitor-net
-    restart: always
     deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
       placement:
         constraints:
           - node.role==manager
+
+  indexer:
+    image: hojland/es_indexer:latest
+    container_name: es
+    networks:
+      - monitor-net
