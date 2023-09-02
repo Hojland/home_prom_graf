@@ -84,13 +84,13 @@ if __name__ == "__main__":
         g_green.labels('livingroom').set(colour.green)
 
         # Gather noise
-        loudest_noise, avg_noiselevel = sound.read_loudest(read_span=1, read_time=PULL_TIME/2)
+        loudest_noise, avg_noiselevel = sound.read_loudest(read_span=2, read_time=PULL_TIME/3)
         g_sound_loud.labels('livingroom').set(loudest_noise)
         g_sound_avg.labels('livingroom').set(avg_noiselevel)
 
         # Maybe only gather noise as the loudest noise within the last second?
         g_time.labels('livingroom').set_to_current_time()
-        time.sleep(PULL_TIME/2) # We also sleep half of pull_time in gathering noise
+        time.sleep(PULL_TIME/3*2) # We also sleep half of pull_time in gathering noise
 
 #TODO
 # Move to another database for electricity (postgres)

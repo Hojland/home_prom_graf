@@ -148,8 +148,8 @@ services:
         constraints:
           - node.role==manager
 
-  indexer:
-    image: hojland/es_indexer:latest
-    container_name: es
-    networks:
-      - monitor-net
+#  indexer:
+#    image: hojland/es_indexer:latest
+#    container_name: es
+#    networks:
+#      - monitor-net
